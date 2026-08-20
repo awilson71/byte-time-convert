@@ -1,0 +1,15 @@
+{
+  "name": "byte-time-convert",
+  "version": "0.1.0",
+  "description": "Convert byte sizes and durations between human-readable strings and precise numbers.",
+  "type": "module",
+  "private": true,
+  "license": "MIT",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "test": "npm run build && node --test dist/test"
+  },
+  "devDependencies": {
+    "typescript": "^5.5.0"
+  }
+}
