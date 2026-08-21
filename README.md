@@ -36,6 +36,19 @@ Durations are parsed as a run of `<number><unit>` pairs with no separators
 negates the whole value. `formatDuration` breaks milliseconds back down into
 the same compact form, dropping any unit that would be zero.
 
+`parseISODuration` and `formatISODuration` cover the ISO 8601 duration
+format instead (`P1DT2H30M`, `PT90S`, `P3W`). There's no `Y` or `M`
+(calendar year/month) support, since those aren't a fixed number of
+milliseconds — everything else here is.
+
+```ts
+import { parseISODuration, formatISODuration } from './src/duration.js'
+
+parseISODuration('P1DT2H30M')    // 95400000
+parseISODuration('P3W')          // 1814400000
+formatISODuration(95_400_000)    // "P1DT2H30M"
+```
+
 ## Development
 
 ```

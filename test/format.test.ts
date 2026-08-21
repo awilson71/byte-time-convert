@@ -1,7 +1,7 @@
 import { test } from 'node:test'
 import assert from 'node:assert/strict'
 import { formatBytes, parseBytes, type FormatBytesOptions } from '../src/bytes.js'
-import { formatDuration, parseDuration } from '../src/duration.js'
+import { formatDuration, parseDuration, formatISODuration, parseISODuration } from '../src/duration.js'
 
 const byteFormatCases: Array<[number, FormatBytesOptions | undefined, string]> = [
   [0, undefined, '0 B'],
@@ -90,5 +90,46 @@ const durationParseErrorCases = ['', '5', '5x', '1h 30m', 'abc']
 for (const input of durationParseErrorCases) {
   test(`parseDuration(${JSON.stringify(input)}) throws`, () => {
     assert.throws(() => parseDuration(input))
+  })
+}
+
+const isoDurationParseCases: Array<[string, number]> = [
+  ['PT0S', 0],
+  ['PT1S', 1000],
+  ['PT1.5S', 1500],
+  ['PT1H30M', 5_400_000],
+  ['P1D', 86_400_000],
+  ['P1DT2H', 93_600_000],
+  ['P3W', 1_814_400_000],
+  ['-PT5M', -300_000],
+  ['+P1D', 86_400_000],
+]
+
+for (const [input, expected] of isoDurationParseCases) {
+  test(`parseISODuration(${JSON.stringify(input)}) === ${expected}`, () => {
+    assert.equal(parseISODuration(input), expected)
+  })
+}
+
+const isoDurationParseErrorCases = ['', 'P', 'PT', '1h30m', 'P1Y', 'P3WT1H']
+
+for (const input of isoDurationParseErrorCases) {
+  test(`parseISODuration(${JSON.stringify(input)}) throws`, () => {
+    assert.throws(() => parseISODuration(input))
+  })
+}
+
+const isoDurationFormatCases: Array<[number, string]> = [
+  [0, 'PT0S'],
+  [1000, 'PT1S'],
+  [5_400_000, 'PT1H30M'],
+  [86_400_000, 'P1D'],
+  [93_600_000, 'P1DT2H'],
+  [-300_000, '-PT5M'],
+]
+
+for (const [ms, expected] of isoDurationFormatCases) {
+  test(`formatISODuration(${ms}) === ${JSON.stringify(expected)}`, () => {
+    assert.equal(formatISODuration(ms), expected)
   })
 }

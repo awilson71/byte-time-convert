@@ -87,3 +87,63 @@ export function formatDuration(ms: number, options: FormatDurationOptions = {}):
 
   return sign + parts.join('')
 }
+
+// PnW is its own top-level form in ISO 8601 and can't combine with the
+// PnDTnHnMnS form, so it gets a separate pattern rather than an optional group.
+const ISO_WEEK_PATTERN = /^([+-])?P(\d+(?:\.\d+)?)W$/
+const ISO_DURATION_PATTERN = /^([+-])?P(?:(\d+)D)?(?:T(?:(\d+)H)?(?:(\d+)M)?(?:(\d+(?:\.\d+)?)S)?)?$/
+
+/** Parses an ISO 8601 duration string like "P1DT2H30M" or "P3W" into milliseconds. */
+export function parseISODuration(input: string): number {
+  const trimmed = input.trim()
+
+  const weekMatch = ISO_WEEK_PATTERN.exec(trimmed)
+  if (weekMatch) {
+    const [, sign, weeks] = weekMatch
+    const totalMs = Number(weeks) * UNIT_MS.w
+    return sign === '-' ? -totalMs : totalMs
+  }
+
+  const match = ISO_DURATION_PATTERN.exec(trimmed)
+  if (!match) {
+    throw new Error(`invalid ISO 8601 duration: "${input}"`)
+  }
+  const [, sign, days, hours, minutes, seconds] = match
+  if (!days && !hours && !minutes && !seconds) {
+    throw new Error(`invalid ISO 8601 duration: "${input}"`)
+  }
+  const totalMs =
+    Number(days ?? 0) * UNIT_MS.d +
+    Number(hours ?? 0) * UNIT_MS.h +
+    Number(minutes ?? 0) * UNIT_MS.m +
+    Number(seconds ?? 0) * UNIT_MS.s
+  return sign === '-' ? -totalMs : totalMs
+}
+
+/** Formats milliseconds as an ISO 8601 duration string, e.g. 5400000 -> "PT1H30M". */
+export function formatISODuration(ms: number): string {
+  if (!Number.isFinite(ms)) {
+    throw new RangeError('duration must be a finite number of milliseconds')
+  }
+  const sign = ms < 0 ? '-' : ''
+  let remaining = Math.round(Math.abs(ms))
+  if (remaining === 0) {
+    return 'PT0S'
+  }
+
+  const days = Math.floor(remaining / UNIT_MS.d)
+  remaining -= days * UNIT_MS.d
+  const hours = Math.floor(remaining / UNIT_MS.h)
+  remaining -= hours * UNIT_MS.h
+  const minutes = Math.floor(remaining / UNIT_MS.m)
+  remaining -= minutes * UNIT_MS.m
+  const seconds = remaining / UNIT_MS.s
+
+  const datePart = days > 0 ? `${days}D` : ''
+  let timePart = ''
+  if (hours > 0) timePart += `${hours}H`
+  if (minutes > 0) timePart += `${minutes}M`
+  if (seconds > 0) timePart += `${seconds}S`
+
+  return `${sign}P${datePart}${timePart ? `T${timePart}` : ''}`
+}
