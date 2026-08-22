@@ -49,6 +49,32 @@ parseISODuration('P3W')          // 1814400000
 formatISODuration(95_400_000)    // "P1DT2H30M"
 ```
 
+## CLI
+
+`src/cli.ts` wraps the same functions for use on the command line. It reads
+values one per line from stdin and writes the converted result to stdout,
+deciding the direction per line: a plain number is formatted into a readable
+string, anything else is parsed into a number.
+
+```
+npm run build
+echo -e "1500000000\n1.5GB\n2MiB" | node dist/src/cli.js --bytes
+# 1.5 GB
+# 1500000000
+# 2097152
+
+echo -e "90000\n1h30m" | node dist/src/cli.js --duration
+# 1m30s
+# 5400000
+```
+
+Flags: `--bytes`, `--duration`, or `--iso-duration` picks the conversion
+(exactly one is required); `--binary` formats byte counts as KiB/MiB/...
+instead of KB/MB/...; `--precision <n>` and `--max-units <n>` are passed
+through to `formatBytes` and `formatDuration`. Lines that fail to parse are
+reported on stderr and skipped rather than stopping the whole run; the
+process exits non-zero if any line failed.
+
 ## Development
 
 ```
