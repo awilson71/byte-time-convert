@@ -32,6 +32,9 @@ const byteParseCases: Array<[string, number]> = [
   ['-1MB', -1_000_000],
   ['  10 GB  ', 10_000_000_000], // surrounding whitespace is tolerated
   ['5kb', 5000], // unit matching is case-insensitive
+  ['1,500,000', 1_500_000], // comma thousand separators
+  ['1,500MB', 1_500_000_000], // separators combined with a unit
+  ['-1,234.5KB', -1_234_500], // separators combined with sign and decimal
 ]
 
 for (const [input, expected] of byteParseCases) {
@@ -40,7 +43,7 @@ for (const [input, expected] of byteParseCases) {
   })
 }
 
-const byteParseErrorCases = ['', 'KB', '1XB', 'abc']
+const byteParseErrorCases = ['', 'KB', '1XB', 'abc', '1,05', ',500']
 
 for (const input of byteParseErrorCases) {
   test(`parseBytes(${JSON.stringify(input)}) throws`, () => {

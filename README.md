@@ -29,7 +29,9 @@ Byte sizes come in two families and the library keeps them distinct: `KB`,
 `MB`, `GB`, ... are base 1000 (decimal, the SI convention), and `KiB`, `MiB`,
 `GiB`, ... are base 1024 (binary). Pass `{ binary: true }` to `formatBytes`
 to get binary units out; `parseBytes` figures out which family a string
-belongs to from its unit.
+belongs to from its unit. `parseBytes` also accepts comma thousand
+separators (`1,500,000`, `"1,500MB"`), as long as the grouping is a real
+one — `1,05` is rejected rather than silently read as `105`.
 
 Durations are parsed as a run of `<number><unit>` pairs with no separators
 (`1h30m`, not `1h 30m`) using `ms`, `s`, `m`, `h`, `d`, `w`. A leading `-`

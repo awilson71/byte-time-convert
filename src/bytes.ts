@@ -20,7 +20,11 @@ const BINARY_UNITS: Record<string, number> = {
 const DECIMAL_ORDER = ['B', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB']
 const BINARY_ORDER = ['B', 'KiB', 'MiB', 'GiB', 'TiB', 'PiB', 'EiB']
 
-const SIZE_PATTERN = /^([+-]?\d*\.?\d+)\s*([a-zA-Z]*)$/
+// The integer part may be plain digits or comma-grouped (1,500,000) but not
+// both loosely mixed — the grouped alternative requires proper groups of
+// three so "1,05" (not a real thousands grouping) is rejected rather than
+// silently truncated.
+const SIZE_PATTERN = /^([+-]?(?:\d{1,3}(?:,\d{3})+|\d+)(?:\.\d+)?)\s*([a-zA-Z]*)$/
 
 export interface FormatBytesOptions {
   /** Use base-1024 units (KiB, MiB, ...) instead of base-1000 (KB, MB, ...). */
@@ -29,14 +33,15 @@ export interface FormatBytesOptions {
   precision?: number
 }
 
-/** Parses a byte size string like "1.5GB" or "2 KiB" into a raw byte count. */
+/** Parses a byte size string like "1.5GB", "2 KiB", or "1,500,000" into a raw byte count. */
 export function parseBytes(input: string): number {
   const trimmed = input.trim()
   const match = SIZE_PATTERN.exec(trimmed)
   if (!match) {
     throw new Error(`invalid byte size: "${input}"`)
   }
-  const [, amount, rawUnit] = match
+  const [, rawAmount, rawUnit] = match
+  const amount = rawAmount.replace(/,/g, '')
   const unit = rawUnit.toLowerCase()
   if (unit === '') {
     return Number(amount)
