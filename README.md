@@ -10,9 +10,12 @@ No dependencies. Two small modules, both plain functions.
 
 ## Usage
 
+```
+npm install byte-time-convert
+```
+
 ```ts
-import { parseBytes, formatBytes } from './src/bytes.js'
-import { parseDuration, formatDuration } from './src/duration.js'
+import { parseBytes, formatBytes, parseDuration, formatDuration } from 'byte-time-convert'
 
 parseBytes('1.5GB')              // 1500000000
 parseBytes('2MiB')               // 2097152
@@ -44,7 +47,7 @@ format instead (`P1DT2H30M`, `PT90S`, `P3W`). There's no `Y` or `M`
 milliseconds — everything else here is.
 
 ```ts
-import { parseISODuration, formatISODuration } from './src/duration.js'
+import { parseISODuration, formatISODuration } from 'byte-time-convert'
 
 parseISODuration('P1DT2H30M')    // 95400000
 parseISODuration('P3W')          // 1814400000

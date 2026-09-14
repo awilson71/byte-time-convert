@@ -3,8 +3,34 @@
   "version": "0.1.0",
   "description": "Convert byte sizes and durations between human-readable strings and precise numbers.",
   "type": "module",
-  "private": true,
   "license": "MIT",
+  "author": "awilson71",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/awilson71/byte-time-convert.git"
+  },
+  "keywords": [
+    "bytes",
+    "duration",
+    "parse",
+    "format",
+    "iso8601",
+    "humanize"
+  ],
+  "main": "dist/src/index.js",
+  "types": "dist/src/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/src/index.d.ts",
+      "default": "./dist/src/index.js"
+    }
+  },
+  "files": [
+    "dist/src"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
   "bin": {
     "byte-time-convert": "dist/src/cli.js"
   },
