@@ -37,7 +37,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "test": "npm run build && node --test dist/test",
-    "cli": "npm run build && node dist/src/cli.js"
+    "cli": "npm run build && node dist/src/cli.js",
+    "prepublishOnly": "npm run test"
   },
   "devDependencies": {
     "typescript": "^5.5.0"
